@@ -4,551 +4,298 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tevin Ian Mokoena | Developer, Maker, Gardener & Researcher</title>
+    
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- GSAP for Animations -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
     <style>
-        html {
-            scroll-behavior: smooth;
-        }
-        body {
-            font-family: 'Inter', sans-serif;
-            color: #334155; /* slate-700 */
-            -webkit-font-smoothing: antialiased;
-            /* Security: Prevent text selection to discourage copying */
-            -webkit-user-select: none;
-            -moz-user-select: none;
-            -ms-user-select: none;
-            user-select: none;
-        }
+        :root { --bg: #111827; --card: #1F2937; --emerald: #10B981; --teal: #14B8A6; --cyan: #06B6D4; }
+        body { font-family: 'Inter', sans-serif; background-color: var(--bg); color: #F3F4F6; overflow-x: hidden; }
         
-        /* Allow text selection on specific readable areas if needed, but keeping it off generally for protection */
-        article p, article h3 {
-            user-select: text;
-        }
-
         /* --- Animations --- */
+        .fade-in-section { opacity: 0; transform: translateY(30px); transition: all 0.8s ease-out; }
+        .fade-in-section.active { opacity: 1; transform: translateY(0); }
         
-        /* 1. Fade Up Section (Scroll Reveal) */
-        .fade-in-section {
-            opacity: 0;
-            transform: translateY(30px);
-            transition: all 0.8s cubic-bezier(0.5, 0, 0, 1);
+        /* Parallax Background */
+        .parallax-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100vh; z-index: -1; 
+            background: radial-gradient(circle at 15% 50%, rgba(16, 185, 129, 0.08), transparent 25%),
+                        radial-gradient(circle at 85% 30%, rgba(6, 182, 212, 0.08), transparent 25%); 
         }
+
+        /* 3D Tilt Effect */
+        .tilt-card { transform-style: preserve-3d; transition: transform 0.1s ease-out; }
         
-        .fade-in-section.active {
-            opacity: 1;
-            transform: translateY(0);
-        }
+        /* Gradient Button */
+        .btn-gradient { background: linear-gradient(135deg, #059669 0%, #0891B2 100%); transition: all 0.3s; }
+        .btn-gradient:hover { transform: translateY(-2px); box-shadow: 0 10px 20px -10px rgba(6, 182, 212, 0.5); }
 
-        /* 2. Staggered Delays for Grid Items */
-        .delay-100 { transition-delay: 0.1s; }
-        .delay-200 { transition-delay: 0.2s; }
-        .delay-300 { transition-delay: 0.3s; }
-        .delay-400 { transition-delay: 0.4s; }
-        .delay-500 { transition-delay: 0.5s; }
+        /* Text Gradient */
+        .text-gradient { background: linear-gradient(to right, #34D399, #22D3EE); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
 
-        /* 3. Filter Animation */
-        @keyframes scaleIn {
-            from { opacity: 0; transform: scale(0.9); }
-            to { opacity: 1; transform: scale(1); }
-        }
-        
-        .item-fade-in {
-            animation: scaleIn 0.4s ease-out forwards;
-        }
+        /* Filter Buttons */
+        .filter-btn.active { background-color: #0F766E; border-color: #0F766E; color: white; }
 
-        /* 4. Hover Icon Animation */
-        .group:hover .icon-bounce {
-            transform: translateY(-4px);
-            transition: transform 0.3s ease;
-        }
-
-        /* 5. Gradient Text - Updated to Teal/Emerald */
-        .text-gradient {
-            background-clip: text;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-image: linear-gradient(to right, #059669, #06B6D4); /* emerald-600 to cyan-500/teal */
-        }
+        /* Modal */
+        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.9); backdrop-filter: blur(5px); animation: fadeIn 0.3s; }
+        .modal.active { display: flex; align-items: center; justify-content: center; }
+        .modal-content { max-width: 90%; max-height: 90vh; border-radius: 0.5rem; animation: zoomIn 0.3s; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes zoomIn { from { transform: scale(0.9); } to { transform: scale(1); } }
     </style>
 </head>
-<!-- Security: Disable right-click context menu -->
-<body class="bg-slate-50 overflow-x-hidden" oncontextmenu="return false;">
+<body class="relative">
 
-    <!-- Header -->
-    <header class="bg-white/90 backdrop-blur-md shadow-sm sticky top-0 z-50 transition-all duration-300" id="navbar">
-        <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="parallax-bg"></div>
+
+    <!-- Navigation -->
+    <nav class="sticky top-0 z-50 bg-gray-900/90 backdrop-blur-md border-b border-gray-800 transition-all duration-300">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-20">
-                <!-- Logo -->
-                <a href="#" class="flex-shrink-0 flex items-center gap-2 group">
-                    <div class="w-10 h-10 bg-emerald-600 rounded-lg flex items-center justify-center transform group-hover:rotate-6 transition-transform">
+                <a href="#" class="flex items-center gap-3 group">
+                    <div class="w-10 h-10 bg-gradient-to-br from-emerald-500 to-cyan-500 rounded-lg flex items-center justify-center transform group-hover:rotate-12 transition-all shadow-lg">
                         <span class="text-white font-bold text-xl">T</span>
                     </div>
-                    <span class="text-2xl font-bold text-slate-800 tracking-tight">Tevin Ian<span class="text-emerald-600">.</span></span>
+                    <span class="text-2xl font-bold text-white tracking-tight">Tevin Ian<span class="text-emerald-400">.</span></span>
                 </a>
                 
-                <!-- Mobile Menu Button -->
-                <div class="md:hidden">
-                    <button type="button" id="mobile-menu-button" class="text-slate-500 hover:text-emerald-600 focus:outline-none transition-colors" aria-label="Toggle menu">
-                        <svg class="h-8 w-8" stroke="currentColor" fill="none" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" />
-                        </svg>
-                    </button>
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="#about" class="text-gray-300 hover:text-emerald-400 transition-colors text-sm font-medium">About</a>
+                    <a href="#webdev" class="text-gray-300 hover:text-emerald-400 transition-colors text-sm font-medium">Web Dev</a>
+                    <a href="#carpentry" class="text-gray-300 hover:text-emerald-400 transition-colors text-sm font-medium">Carpentry</a>
+                    <a href="#gardening" class="text-gray-300 hover:text-emerald-400 transition-colors text-sm font-medium">Gardening</a>
+                    <a href="#maps" class="text-gray-300 hover:text-emerald-400 transition-colors text-sm font-medium">Maps</a>
+                    <a href="#research" class="text-gray-300 hover:text-emerald-400 transition-colors text-sm font-medium">Research</a>
                 </div>
-                
-                <!-- Desktop Nav -->
-                <div class="hidden md:flex md:items-center md:space-x-8">
-                    <a href="#" class="font-medium text-slate-600 hover:text-emerald-600 px-3 py-2 text-sm transition-colors">Home</a>
-                    <a href="#projects" class="font-medium text-slate-600 hover:text-emerald-600 px-3 py-2 text-sm transition-colors">Projects</a>
-                    <a href="#guides" class="font-medium text-slate-600 hover:text-emerald-600 px-3 py-2 text-sm transition-colors">How-To's</a>
-                    <a href="#about" class="font-medium text-slate-600 hover:text-emerald-600 px-3 py-2 text-sm transition-colors">About</a>
-                    <a href="#contact" class="font-medium text-slate-600 hover:text-emerald-600 px-3 py-2 text-sm transition-colors">Contact</a>
-                    <a href="#contact" class="bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2.5 rounded-full text-sm font-medium transition-all shadow-md hover:shadow-lg transform hover:-translate-y-0.5">
-                        Get In Touch
-                    </a>
-                </div>
-            </div>
-        </nav>
-        
-        <!-- Mobile Menu -->
-        <div id="mobile-menu" class="hidden md:hidden bg-white border-t border-slate-100">
-            <div class="px-4 pt-2 pb-6 space-y-2 shadow-lg">
-                <a href="#" class="block px-3 py-3 rounded-lg text-base font-medium text-emerald-600 bg-emerald-50">Home</a>
-                <a href="#projects" class="block px-3 py-3 rounded-lg text-base font-medium text-slate-600 hover:bg-slate-50 hover:text-emerald-600">Projects</a>
-                <a href="#guides" class="block px-3 py-3 rounded-lg text-base font-medium text-slate-600 hover:bg-slate-50 hover:text-emerald-600">How-To's</a>
-                <a href="#about" class="block px-3 py-3 rounded-lg text-base font-medium text-slate-600 hover:bg-slate-50 hover:text-emerald-600">About</a>
-                <a href="#contact" class="block px-3 py-3 rounded-lg text-base font-medium text-slate-600 hover:bg-slate-50 hover:text-emerald-600">Contact</a>
             </div>
         </div>
-    </header>
+    </nav>
 
     <main>
         <!-- Hero Section -->
-        <section class="relative bg-white overflow-hidden">
-             <!-- Background Decoration -->
-            <div class="absolute top-0 left-0 w-full h-full overflow-hidden z-0 opacity-30">
-                <div class="absolute -top-[10%] -right-[5%] w-[500px] h-[500px] rounded-full bg-emerald-100 blur-3xl"></div>
-                <div class="absolute top-[20%] -left-[5%] w-[400px] h-[400px] rounded-full bg-teal-100 blur-3xl"></div>
-            </div>
+        <section class="min-h-screen flex items-center justify-center pt-10 pb-20 relative overflow-hidden">
+            <div class="absolute top-20 right-10 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl animate-pulse"></div>
+            <div class="absolute bottom-20 left-10 w-72 h-72 bg-cyan-500/10 rounded-full blur-3xl animate-pulse" style="animation-delay: 2s;"></div>
 
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 md:py-32 relative z-10">
-                <div class="text-center max-w-4xl mx-auto fade-in-section active">
-                    <span class="inline-block py-1 px-3 rounded-full bg-emerald-50 text-emerald-600 text-sm font-semibold mb-6 border border-emerald-100">
-                        👋 Welcome to my portfolio
-                    </span>
-                    <h1 class="text-5xl md:text-7xl font-extrabold text-slate-900 leading-tight mb-6 tracking-tight">
-                        A Digital & <span class="text-gradient">Physical</span> Workshop
-                    </h1>
-                    <p class="text-xl text-slate-600 max-w-2xl mx-auto mb-10 leading-relaxed">
-                        Hi, I'm <strong class="text-slate-800">Tevin Ian Mokoena</strong>. I'm a multi-passionate maker, researcher, and guide. This is my collection of web apps, garden logs, carpentry projects, and local guides.
-                    </p>
-                    <div class="flex flex-col sm:flex-row justify-center gap-4">
-                        <a href="#projects" class="group inline-flex items-center justify-center bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-4 px-8 rounded-full text-lg transition-all shadow-lg hover:shadow-emerald-500/30 hover:-translate-y-1">
-                            <span>View My Work</span>
-                            <svg class="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path></svg>
-                        </a>
-                        <a href="#about" class="inline-flex items-center justify-center bg-white border border-slate-200 hover:border-slate-300 hover:bg-slate-50 text-slate-700 font-bold py-4 px-8 rounded-full text-lg transition-all shadow-sm hover:shadow-md">
-                            More About Me
-                        </a>
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10 fade-in-section">
+                <div class="inline-block px-4 py-1.5 mb-6 rounded-full bg-gray-800 border border-gray-700 text-emerald-400 text-sm font-bold uppercase tracking-wider">
+                    Developer • Maker • Researcher
+                </div>
+                <h1 class="text-5xl md:text-7xl font-extrabold text-white tracking-tight mb-6 leading-tight">
+                    Bridging the <span class="text-gradient">Digital</span> & <br>
+                    <span class="text-gradient">Physical</span> Worlds
+                </h1>
+                <p class="mt-4 text-xl text-gray-400 max-w-2xl mx-auto mb-10 leading-relaxed">
+                    I build sustainable systems—from full-stack web applications to organic gardens and custom furniture.
+                </p>
+                <div class="flex flex-col sm:flex-row justify-center gap-4">
+                    <a href="#webdev" class="btn-gradient px-8 py-4 rounded-full text-white font-bold text-lg shadow-lg">Request Project</a>
+                    <a href="#maps" class="px-8 py-4 rounded-full bg-gray-800 text-gray-300 font-bold text-lg border border-gray-700 hover:bg-gray-700 transition-all">Explore Maps</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- About Section (Portrait Fixed) -->
+        <section id="about" class="py-24 bg-gray-800/50">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="grid lg:grid-cols-2 gap-16 items-center fade-in-section">
+                    <!-- Portrait with 3D Tilt -->
+                    <div class="tilt-card group relative">
+                        <div class="absolute -inset-1 bg-gradient-to-r from-emerald-500 to-cyan-500 rounded-2xl blur opacity-25 group-hover:opacity-50 transition duration-500"></div>
+                        <div class="relative rounded-2xl overflow-hidden bg-gray-900 border border-gray-700 aspect-[4/5]">
+                            <!-- FIX: Image source set to local file with explicit error handling -->
+                            <img src="unnamed.jpg" 
+                                 onerror="this.src='https://placehold.co/600x750/1F2937/10B981?text=Save+Photo+As+unnamed.jpg&font=inter'"
+                                 alt="Tevin Ian Mokoena" 
+                                 class="w-full h-full object-cover transform transition duration-700 group-hover:scale-105"
+                                 onclick="openModal(this.src)">
+                            
+                            <div class="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-gray-900 via-gray-900/80 to-transparent">
+                                <p class="text-white font-bold text-xl">Tevin Ian Mokoena</p>
+                                <p class="text-emerald-400 text-sm">Multi-Disciplinary Creator</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Bio & Links -->
+                    <div>
+                        <h2 class="text-3xl md:text-4xl font-bold text-white mb-6">About Me</h2>
+                        <div class="space-y-4 text-gray-300 text-lg leading-relaxed mb-10">
+                            <p>By day, I'm an <strong class="text-white">academic researcher</strong> and <strong class="text-white">web developer</strong>. By night (and on weekends), you'll find me in my workshop covered in sawdust, in the garden, or exploring the hidden gems of my city.</p>
+                            <p>I believe in the power of "doing". This site is my personal documentation of everything I build, grow, and learn. It's not just a portfolio; it's a living archive of my curiosity.</p>
+                        </div>
+
+                        <div class="space-y-3">
+                            <h3 class="text-emerald-400 font-semibold uppercase tracking-wider text-sm mb-4">Connect with Me</h3>
+                            
+                            <a href="mailto:tevin.mokoena@gmail.com" class="flex items-center p-3 rounded-lg bg-gray-800 border border-gray-700 hover:border-emerald-500 hover:bg-gray-700 transition-all group">
+                                <svg class="w-5 h-5 text-emerald-500 mr-3 group-hover:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                                <span>tevin.mokoena@gmail.com</span>
+                            </a>
+                            <a href="mailto:201941899@ump.com" class="flex items-center p-3 rounded-lg bg-gray-800 border border-gray-700 hover:border-teal-500 hover:bg-gray-700 transition-all group">
+                                <svg class="w-5 h-5 text-teal-500 mr-3 group-hover:text-teal-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+                                <span>201941899@ump.com (Academic)</span>
+                            </a>
+                            <a href="https://www.linkedin.com/in/tevin-mokoena" target="_blank" class="flex items-center p-3 rounded-lg bg-gray-800 border border-gray-700 hover:border-blue-500 hover:bg-gray-700 transition-all group">
+                                <svg class="w-5 h-5 text-blue-500 mr-3 group-hover:text-blue-400" fill="currentColor" viewBox="0 0 24 24"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.784-1.75-1.75s.784-1.75 1.75-1.75 1.75.784 1.75 1.75-.783 1.75-1.75 1.75zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
+                                <span>LinkedIn</span>
+                            </a>
+                            <a href="https://scholar.google.com/citations?user=qHrWnBoAAAAJ&hl=en" target="_blank" class="flex items-center p-3 rounded-lg bg-gray-800 border border-gray-700 hover:border-blue-400 hover:bg-gray-700 transition-all group">
+                                <svg class="w-5 h-5 text-blue-400 mr-3 group-hover:text-blue-300" fill="currentColor" viewBox="0 0 24 24"><path d="M12 24a7 7 0 1 1 0-14 7 7 0 0 1 0 14zm0-24L0 9.5l12 9.5 12-9.5L12 0z"/></svg>
+                                <span>Google Scholar</span>
+                            </a>
+                            <a href="https://www.researchgate.net/profile/Tevin-Mokoena" target="_blank" class="flex items-center p-3 rounded-lg bg-gray-800 border border-gray-700 hover:border-emerald-400 hover:bg-gray-700 transition-all group">
+                                <svg class="w-5 h-5 text-emerald-400 mr-3 group-hover:text-emerald-300" fill="currentColor" viewBox="0 0 24 24"><path d="M19.586 0c-.818 0-2.508 4.646-4.668 4.646H8.261v6.702h4.538s3.045-.231 3.045 4.154c0 3.235-3.045 3.023-3.045 3.023h-4.538V24h-4.2V4.646H0v-3.75h19.586z"/></svg>
+                                <span>ResearchGate</span>
+                            </a>
+                            <a href="https://orcid.org/0009-0009-8937-1177" target="_blank" class="flex items-center p-3 rounded-lg bg-gray-800 border border-gray-700 hover:border-green-500 hover:bg-gray-700 transition-all group">
+                                <svg class="w-5 h-5 text-green-500 mr-3 group-hover:text-green-400" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0C5.372 0 0 5.372 0 12s5.372 12 12 12 12-5.372 12-12S18.628 0 12 0zM7.369 4.378c.525 0 .947.431.947.947 0 .525-.422.948-.947.948a.95.95 0 0 1-.948-.948c0-.516.422-.947.948-.947zm1.82 13.62h-3.64v-9.1h3.64v9.1zm9.1-3.696c0 2.597-2.057 3.696-4.99 3.696h-2.91V8.897h2.91c2.933 0 4.99 1.099 4.99 3.696z"/></svg>
+                                <span>ORCID: 0009-0009-8937-1177</span>
+                            </a>
+                        </div>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- Interests Section -->
-        <section class="py-24 bg-slate-50">
+        <!-- Search Section -->
+        <section class="py-12 bg-gray-900 border-b border-gray-800">
+            <div class="max-w-2xl mx-auto px-4">
+                <div class="relative">
+                    <input type="text" id="globalSearch" placeholder="Search projects, guides, or topics..." 
+                           class="w-full bg-gray-800 border border-gray-700 rounded-full py-4 pl-12 pr-4 text-white focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-all">
+                    <svg class="w-6 h-6 text-gray-500 absolute left-4 top-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                </div>
+            </div>
+        </section>
+
+        <!-- Web Dev Section -->
+        <section id="webdev" class="py-24">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="text-center mb-16 fade-in-section">
-                    <h2 class="text-3xl md:text-4xl font-bold text-slate-900">Explore My Interests</h2>
-                    <p class="mt-4 text-lg text-slate-600 max-w-2xl mx-auto">
-                        I thrive at the intersection of the digital and physical worlds.
-                    </p>
+                    <h2 class="text-3xl md:text-4xl font-bold text-white mb-4">💻 Web & App Development</h2>
+                    <p class="text-gray-400">Building functional, high-performance applications.</p>
                 </div>
-                
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
-                    <!-- Interest 1: Web Dev -->
-                    <a href="#projects" onclick="filterProjects('web')" class="group bg-white p-8 rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 border border-slate-100 fade-in-section delay-100 cursor-pointer">
-                        <div class="bg-teal-50 rounded-2xl p-4 w-16 h-16 flex items-center justify-center mb-6 group-hover:bg-teal-600 transition-colors duration-300">
-                            <svg class="h-8 w-8 text-teal-600 icon-bounce group-hover:text-white transition-colors" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M17.25 6.75L22.5 12l-5.25 5.25m-10.5 0L1.5 12l5.25-5.25m7.5 0l-4.5 16.5" /></svg>
-                        </div>
-                        <h3 class="text-xl font-bold text-slate-800 group-hover:text-teal-600 transition-colors">Web Dev</h3>
-                        <p class="mt-2 text-slate-500 text-sm leading-relaxed">Building functional, modern applications with React & Node.js.</p>
-                    </a>
-                    
-                    <!-- Interest 2: Gardening -->
-                    <a href="#projects" onclick="filterProjects('gardening')" class="group bg-white p-8 rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 border border-slate-100 fade-in-section delay-200 cursor-pointer">
-                        <div class="bg-emerald-50 rounded-2xl p-4 w-16 h-16 flex items-center justify-center mb-6 group-hover:bg-emerald-600 transition-colors duration-300">
-                            <svg class="h-8 w-8 text-emerald-600 icon-bounce group-hover:text-white transition-colors" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" /></svg>
-                        </div>
-                        <h3 class="text-xl font-bold text-slate-800 group-hover:text-emerald-600 transition-colors">Gardening</h3>
-                        <p class="mt-2 text-slate-500 text-sm leading-relaxed">Cultivating vegetables and herbs with sustainable practices.</p>
-                    </a>
+                <div id="web-grid" class="grid md:grid-cols-3 gap-8 mb-20 fade-in-section"></div>
 
-                    <!-- Interest 3: Carpentry -->
-                    <a href="#projects" onclick="filterProjects('carpentry')" class="group bg-white p-8 rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 border border-slate-100 fade-in-section delay-300 cursor-pointer">
-                        <div class="bg-amber-50 rounded-2xl p-4 w-16 h-16 flex items-center justify-center mb-6 group-hover:bg-amber-600 transition-colors duration-300">
-                            <svg class="h-8 w-8 text-amber-600 icon-bounce group-hover:text-white transition-colors" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M11.42 15.17L17.25 21A2.652 2.652 0 0021 17.25l-5.83-5.83M11.42 15.17l.017-.017L15.82 9.34l-5.83-5.83L8.18 5.31m3.24 9.86l-4.12-4.12c-.52-.52-.77-1.22-.77-1.93s.25-1.41.77-1.93l4.12-4.12c.52-.52 1.22-.77 1.93-.77s1.41.25 1.93.77l4.12 4.12c.52.52.77 1.22.77 1.93s-.25 1.41-.77 1.93l-4.12 4.12c-.52.52-1.22.77-1.93.77s-1.41-.25-1.93-.77z" /></svg>
+                <div class="bg-gray-800 rounded-2xl p-8 md:p-12 border border-gray-700 fade-in-section">
+                    <h3 class="text-2xl font-bold text-white text-center mb-6">Start a Project</h3>
+                    <form onsubmit="handleFormSubmit(event, 'Web Dev Request')" class="max-w-2xl mx-auto space-y-6">
+                        <div class="grid md:grid-cols-2 gap-6">
+                            <input type="text" placeholder="Name" required class="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-3 text-white focus:border-emerald-500 outline-none">
+                            <input type="email" placeholder="Email" required class="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-3 text-white focus:border-emerald-500 outline-none">
                         </div>
-                        <h3 class="text-xl font-bold text-slate-800 group-hover:text-amber-600 transition-colors">Carpentry</h3>
-                        <p class="mt-2 text-slate-500 text-sm leading-relaxed">Building custom furniture and garden structures by hand.</p>
-                    </a>
-
-                    <!-- Interest 4: Maps -->
-                    <a href="#projects" onclick="filterProjects('maps')" class="group bg-white p-8 rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 border border-slate-100 fade-in-section delay-400 cursor-pointer">
-                        <div class="bg-red-50 rounded-2xl p-4 w-16 h-16 flex items-center justify-center mb-6 group-hover:bg-red-600 transition-colors duration-300">
-                            <svg class="h-8 w-8 text-red-600 icon-bounce group-hover:text-white transition-colors" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" /></svg>
-                        </div>
-                        <h3 class="text-xl font-bold text-slate-800 group-hover:text-red-600 transition-colors">Local Guide</h3>
-                        <p class="mt-2 text-slate-500 text-sm leading-relaxed">Documenting local gems as a Google Maps contributor.</p>
-                    </a>
-
-                    <!-- Interest 5: Research -->
-                    <a href="#projects" onclick="filterProjects('research')" class="group bg-white p-8 rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 border border-slate-100 fade-in-section delay-500 cursor-pointer">
-                        <div class="bg-cyan-50 rounded-2xl p-4 w-16 h-16 flex items-center justify-center mb-6 group-hover:bg-cyan-600 transition-colors duration-300">
-                            <svg class="h-8 w-8 text-cyan-600 icon-bounce group-hover:text-white transition-colors" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18c-2.305 0-4.408.867-6 2.292m0-14.25v14.25" /></svg>
-                        </div>
-                        <h3 class="text-xl font-bold text-slate-800 group-hover:text-cyan-600 transition-colors">Research</h3>
-                        <p class="mt-2 text-slate-500 text-sm leading-relaxed">Published academic papers and ongoing field research.</p>
-                    </a>
+                        <select class="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-3 text-white focus:border-emerald-500 outline-none">
+                            <option>Web Development</option>
+                            <option>App Development</option>
+                            <option>Consulting</option>
+                        </select>
+                        <textarea rows="4" placeholder="Project Details" required class="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-3 text-white focus:border-emerald-500 outline-none"></textarea>
+                        <button type="submit" class="w-full btn-gradient py-4 rounded-lg text-white font-bold">Send Request</button>
+                    </form>
                 </div>
             </div>
         </section>
 
-        <!-- Projects Section -->
-        <section id="projects" class="py-24 bg-white relative">
+        <!-- Carpentry Section -->
+        <section id="carpentry" class="py-24 bg-gray-800/30">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="text-center fade-in-section">
-                    <span class="text-emerald-600 font-semibold text-sm tracking-wider uppercase mb-2 block">Portfolio</span>
-                    <h2 class="text-3xl md:text-4xl font-bold text-slate-900">Featured Projects</h2>
-                    <p class="mt-4 text-lg text-slate-600 max-w-2xl mx-auto">
-                        A curated selection of my favorite projects filtered by category.
-                    </p>
-                </div>
-
-                <!-- Filter Buttons -->
-                <div class="flex flex-wrap justify-center gap-3 mt-12 fade-in-section delay-100">
-                    <button class="filter-btn active-filter inline-flex items-center gap-2 bg-slate-800 text-white font-medium py-2.5 px-6 rounded-full shadow-md transition-all duration-300 hover:transform hover:-translate-y-1" data-filter="all">
-                        <span>All</span>
-                    </button>
-                    <button class="filter-btn inline-flex items-center gap-2 bg-white text-slate-600 border border-slate-200 hover:border-teal-300 hover:text-teal-600 hover:bg-teal-50 font-medium py-2.5 px-6 rounded-full shadow-sm transition-all duration-300 hover:transform hover:-translate-y-1" data-filter="web">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path></svg>
-                        <span>Web</span>
-                    </button>
-                    <button class="filter-btn inline-flex items-center gap-2 bg-white text-slate-600 border border-slate-200 hover:border-emerald-300 hover:text-emerald-600 hover:bg-emerald-50 font-medium py-2.5 px-6 rounded-full shadow-sm transition-all duration-300 hover:transform hover:-translate-y-1" data-filter="gardening">
-                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
-                        <span>Garden</span>
-                    </button>
-                    <button class="filter-btn inline-flex items-center gap-2 bg-white text-slate-600 border border-slate-200 hover:border-amber-300 hover:text-amber-600 hover:bg-amber-50 font-medium py-2.5 px-6 rounded-full shadow-sm transition-all duration-300 hover:transform hover:-translate-y-1" data-filter="carpentry">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
-                        <span>Carpentry</span>
-                    </button>
-                    <button class="filter-btn inline-flex items-center gap-2 bg-white text-slate-600 border border-slate-200 hover:border-red-300 hover:text-red-600 hover:bg-red-50 font-medium py-2.5 px-6 rounded-full shadow-sm transition-all duration-300 hover:transform hover:-translate-y-1" data-filter="maps">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
-                        <span>Maps</span>
-                    </button>
-                    <button class="filter-btn inline-flex items-center gap-2 bg-white text-slate-600 border border-slate-200 hover:border-cyan-300 hover:text-cyan-600 hover:bg-cyan-50 font-medium py-2.5 px-6 rounded-full shadow-sm transition-all duration-300 hover:transform hover:-translate-y-1" data-filter="research">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-                        <span>Research</span>
-                    </button>
-                </div>
-                
-                <!-- Grid -->
-                <div id="project-grid" class="mt-16 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 fade-in-section delay-200">
-                    
-                    <!-- Card 1: Web Dev (Teal) -->
-                    <div class="project-card group bg-white rounded-2xl shadow-lg hover:shadow-2xl overflow-hidden transition-all duration-500 border border-slate-100" data-category="web">
-                        <div class="relative overflow-hidden h-60">
-                            <div class="absolute inset-0 bg-slate-900/10 group-hover:bg-slate-900/0 transition-colors z-10"></div>
-                            <img src="https://placehold.co/800x600/0D9488/FFFFFF?text=React+App&font=inter" onerror="this.onerror=null; this.src='https://placehold.co/800x600/0D9488/FFFFFF?text=React+App';" alt="React E-commerce App" class="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700">
-                        </div>
-                        <div class="p-8">
-                            <div class="flex items-center justify-between mb-3">
-                                <span class="text-xs font-bold text-teal-600 bg-teal-50 px-2.5 py-1 rounded-full uppercase tracking-wide">Web Development</span>
-                                <svg class="w-5 h-5 text-slate-300 group-hover:text-teal-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
-                            </div>
-                            <h3 class="text-2xl font-bold text-slate-900 mb-3 group-hover:text-teal-600 transition-colors">E-commerce React App</h3>
-                            <p class="text-slate-600 mb-6 line-clamp-2">A full-stack e-commerce site built with React, Node.js, and Stripe integration for seamless payments.</p>
-                            <a href="#" class="inline-flex items-center font-semibold text-slate-800 hover:text-teal-600 transition-colors">
-                                View Case Study <span class="ml-2 group-hover:translate-x-1 transition-transform">→</span>
-                            </a>
-                        </div>
-                    </div>
-                    
-                    <!-- Card 2: Carpentry & Gardening (Amber) -->
-                    <div class="project-card group bg-white rounded-2xl shadow-lg hover:shadow-2xl overflow-hidden transition-all duration-500 border border-slate-100" data-category="carpentry gardening">
-                         <div class="relative overflow-hidden h-60">
-                            <div class="absolute inset-0 bg-slate-900/10 group-hover:bg-slate-900/0 transition-colors z-10"></div>
-                            <img src="https://placehold.co/800x600/F59E0B/FFFFFF?text=DIY+Planter&font=inter" onerror="this.onerror=null; this.src='https://placehold.co/800x600/F59E0B/FFFFFF?text=DIY+Planter';" alt="DIY Rain Barrel" class="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700">
-                        </div>
-                        <div class="p-8">
-                            <div class="flex items-center justify-between mb-3">
-                                <span class="text-xs font-bold text-amber-600 bg-amber-50 px-2.5 py-1 rounded-full uppercase tracking-wide">Carpentry & DIY</span>
-                                <svg class="w-5 h-5 text-slate-300 group-hover:text-amber-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
-                            </div>
-                            <h3 class="text-2xl font-bold text-slate-900 mb-3 group-hover:text-amber-600 transition-colors">How-To: Cedar Planter Box</h3>
-                            <p class="text-slate-600 mb-6 line-clamp-2">A complete "how-to" guide documenting the build of a 4x8 cedar raised garden bed using simple tools.</p>
-                            <a href="#" class="inline-flex items-center font-semibold text-slate-800 hover:text-amber-600 transition-colors">
-                                Read Guide <span class="ml-2 group-hover:translate-x-1 transition-transform">→</span>
-                            </a>
-                        </div>
-                    </div>
-                    
-                    <!-- Card 3: Maps (Red) -->
-                    <div class="project-card group bg-white rounded-2xl shadow-lg hover:shadow-2xl overflow-hidden transition-all duration-500 border border-slate-100" data-category="maps">
-                         <div class="relative overflow-hidden h-60">
-                            <div class="absolute inset-0 bg-slate-900/10 group-hover:bg-slate-900/0 transition-colors z-10"></div>
-                            <img src="https://placehold.co/800x600/EF4444/FFFFFF?text=Local+Guide&font=inter" onerror="this.onerror=null; this.src='https://placehold.co/800x600/EF4444/FFFFFF?text=Local+Guide';" alt="Map of local murals" class="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700">
-                        </div>
-                        <div class="p-8">
-                            <div class="flex items-center justify-between mb-3">
-                                <span class="text-xs font-bold text-red-600 bg-red-50 px-2.5 py-1 rounded-full uppercase tracking-wide">Maps & Guides</span>
-                                <svg class="w-5 h-5 text-slate-300 group-hover:text-red-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
-                            </div>
-                            <h3 class="text-2xl font-bold text-slate-900 mb-3 group-hover:text-red-600 transition-colors">Mapping My City's Murals</h3>
-                            <p class="text-slate-600 mb-6 line-clamp-2">A public Google Map and photo gallery documenting over 50+ public art pieces in the downtown area.</p>
-                            <a href="#" class="inline-flex items-center font-semibold text-slate-800 hover:text-red-600 transition-colors">
-                                Explore Map <span class="ml-2 group-hover:translate-x-1 transition-transform">→</span>
-                            </a>
-                        </div>
+                <div class="text-center mb-12 fade-in-section">
+                    <h2 class="text-3xl md:text-4xl font-bold text-white mb-4">🪵 Sustainable Carpentry</h2>
+                    <div class="flex justify-center flex-wrap gap-2 mt-6">
+                        <button class="filter-btn active px-4 py-2 rounded-full border border-gray-600 text-gray-300 text-sm transition-all" onclick="filterData('carpentry', 'all', this)">All</button>
+                        <button class="filter-btn px-4 py-2 rounded-full border border-gray-600 text-gray-300 text-sm transition-all" onclick="filterData('carpentry', 'Furniture', this)">Furniture</button>
+                        <button class="filter-btn px-4 py-2 rounded-full border border-gray-600 text-gray-300 text-sm transition-all" onclick="filterData('carpentry', 'DIY', this)">DIY</button>
+                        <button class="filter-btn px-4 py-2 rounded-full border border-gray-600 text-gray-300 text-sm transition-all" onclick="filterData('carpentry', 'Storage', this)">Storage</button>
                     </div>
                 </div>
+                <div id="carpentry-grid" class="grid md:grid-cols-2 lg:grid-cols-3 gap-8 fade-in-section"></div>
             </div>
         </section>
 
-        <!-- Guides/Blog Section -->
-        <section id="guides" class="bg-slate-100 py-24">
+        <!-- Gardening Section -->
+        <section id="gardening" class="py-24">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="flex flex-col md:flex-row justify-between items-end mb-12 fade-in-section">
-                    <div class="text-left max-w-2xl">
-                        <span class="text-emerald-600 font-semibold text-sm tracking-wider uppercase mb-2 block">Knowledge Base</span>
-                        <h2 class="text-3xl md:text-4xl font-bold text-slate-900">From the Blog & Docs</h2>
-                        <p class="mt-4 text-lg text-slate-600">
-                            My latest how-to's, research notes, and garden logs.
-                        </p>
+                <div class="text-center mb-12 fade-in-section">
+                    <h2 class="text-3xl md:text-4xl font-bold text-white mb-4">🌱 Sustainable Gardening</h2>
+                    <div class="flex justify-center flex-wrap gap-2 mt-6">
+                        <button class="filter-btn active px-4 py-2 rounded-full border border-gray-600 text-gray-300 text-sm transition-all" onclick="filterData('gardening', 'all', this)">All</button>
+                        <button class="filter-btn px-4 py-2 rounded-full border border-gray-600 text-gray-300 text-sm transition-all" onclick="filterData('gardening', 'Edible', this)">Edible Plants</button>
+                        <button class="filter-btn px-4 py-2 rounded-full border border-gray-600 text-gray-300 text-sm transition-all" onclick="filterData('gardening', 'Composting', this)">Composting</button>
+                        <button class="filter-btn px-4 py-2 rounded-full border border-gray-600 text-gray-300 text-sm transition-all" onclick="filterData('gardening', 'Hydroponics', this)">Hydroponics</button>
                     </div>
-                    <a href="#" class="hidden md:inline-flex items-center font-medium text-emerald-600 hover:text-emerald-800 mt-4 md:mt-0">
-                        View all posts <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>
-                    </a>
                 </div>
-                
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 fade-in-section delay-100">
-                    
-                    <!-- NEW: Card 7: Unpublished Research (Security Feature) -->
-                    <article class="bg-white rounded-2xl shadow-sm hover:shadow-lg overflow-hidden flex flex-col transition-all duration-300 group relative">
-                        <!-- Security Badge -->
-                        <div class="absolute top-4 right-4 z-10 bg-slate-900/80 text-white text-xs font-bold px-2 py-1 rounded backdrop-blur-sm flex items-center gap-1">
-                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
-                            <span>Unpublished</span>
-                        </div>
-                        <div class="relative h-56 overflow-hidden bg-slate-200 flex items-center justify-center">
-                            <div class="text-slate-400 flex flex-col items-center">
-                                <svg class="w-16 h-16 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-                                <span class="text-sm font-semibold uppercase tracking-wider">Research Draft</span>
-                            </div>
-                        </div>
-                        <div class="p-8 flex-grow">
-                            <div class="flex items-center gap-3 text-sm mb-3">
-                                <span class="text-slate-400">Nov 2025</span> 
-                                <span class="w-1 h-1 bg-slate-300 rounded-full"></span>
-                                <span class="inline-flex items-center text-cyan-700 font-medium bg-cyan-50 px-2 py-0.5 rounded-full text-xs">
-                                    Research
-                                </span>
-                            </div>
-                            <h3 class="text-xl font-bold text-slate-900 group-hover:text-cyan-600 transition-colors mb-3">Water-Scarcity Adaptation Strategies in Nkomazi</h3>
-                            <p class="text-slate-500 text-sm leading-relaxed">An investigation into how smallholder farmers in Nkomazi adopt low-cost strategies like crop rotation and water storage to combat climate vulnerability.</p>
-                        </div>
-                        <div class="px-8 pb-8 pt-0 mt-auto">
-                            <!-- Security: Mailto link for request access -->
-                            <a href="mailto:tevin.mokoena@gmail.com?subject=Request Access: Water-Scarcity Adaptation Strategies Research" class="inline-flex items-center text-slate-700 font-semibold text-sm hover:text-cyan-600 transition-colors border border-slate-200 rounded-lg px-4 py-2 hover:border-cyan-300 bg-slate-50 hover:bg-white">
-                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"></path></svg>
-                                Request Access
-                            </a>
-                        </div>
-                    </article>
+                <div id="gardening-grid" class="grid md:grid-cols-2 lg:grid-cols-3 gap-8 fade-in-section"></div>
+            </div>
+        </section>
 
-                    <!-- NEW: Card 4: Liquid Fertilizer (Gardening) -->
-                    <article class="bg-white rounded-2xl shadow-sm hover:shadow-lg overflow-hidden flex flex-col transition-all duration-300 group">
-                        <div class="relative h-56 overflow-hidden">
-                            <img src="https://placehold.co/600x400/047857/FFFFFF?text=Liquid+Fertilizer&font=inter" onerror="this.onerror=null; this.src='https://placehold.co/600x400/047857/FFFFFF?text=Liquid+Fertilizer';" alt="A bottle of homemade liquid fertilizer" class="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500">
-                        </div>
-                        <div class="p-8 flex-grow">
-                            <div class="flex items-center gap-3 text-sm mb-3">
-                                <span class="text-slate-400">Dec 9, 2025</span> 
-                                <span class="w-1 h-1 bg-slate-300 rounded-full"></span>
-                                <span class="inline-flex items-center text-emerald-700 font-medium bg-emerald-50 px-2 py-0.5 rounded-full text-xs">
-                                    Gardening
-                                </span>
-                            </div>
-                            <h3 class="text-xl font-bold text-slate-900 group-hover:text-emerald-600 transition-colors mb-3">DIY: How to Make Free Liquid Fertilizer at Home</h3>
-                            <p class="text-slate-500 text-sm leading-relaxed">Simple steps and resources for brewing your own nutrient-rich compost and manure teas.</p>
-                        </div>
-                        <div class="px-8 pb-8 pt-0 mt-auto">
-                            <a href="#" class="text-emerald-600 font-semibold text-sm hover:underline">Read Guide</a>
-                        </div>
-                    </article>
-                    
-                    <!-- NEW: Card 5: Herbal Tea (Gardening) -->
-                    <article class="bg-white rounded-2xl shadow-sm hover:shadow-lg overflow-hidden flex flex-col transition-all duration-300 group">
-                        <div class="relative h-56 overflow-hidden">
-                            <img src="https://placehold.co/600x400/14B8A6/FFFFFF?text=Herbal+Tea+Blend&font=inter" onerror="this.onerror=null; this.src='https://placehold.co/600x400/14B8A6/FFFFFF?text=Herbal+Tea+Blend';" alt="Herbal tea ingredients" class="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500">
-                        </div>
-                        <div class="p-8 flex-grow">
-                            <div class="flex items-center gap-3 text-sm mb-3">
-                                <span class="text-slate-400">Dec 9, 2025</span> 
-                                <span class="w-1 h-1 bg-slate-300 rounded-full"></span>
-                                <span class="inline-flex items-center text-teal-700 font-medium bg-teal-50 px-2 py-0.5 rounded-full text-xs">
-                                    Health & Herbs
-                                </span>
-                            </div>
-                            <h3 class="text-xl font-bold text-slate-900 group-hover:text-teal-600 transition-colors mb-3">The Benefits of Parsley, Rosemary, and Peppermint Tea</h3>
-                            <p class="text-slate-500 text-sm leading-relaxed">A look at the antioxidant, digestive, and cognitive benefits of this specific herbal blend.</p>
-                        </div>
-                        <div class="px-8 pb-8 pt-0 mt-auto">
-                            <a href="#" class="text-emerald-600 font-semibold text-sm hover:underline">Read Analysis</a>
-                        </div>
-                    </article>
-
-                    <!-- NEW: Card 6: Vertical Farming (Gardening) -->
-                    <article class="bg-white rounded-2xl shadow-sm hover:shadow-lg overflow-hidden flex flex-col transition-all duration-300 group">
-                        <div class="relative h-56 overflow-hidden">
-                            <img src="https://placehold.co/600x400/0F766E/FFFFFF?text=Vertical+Farm&font=inter" onerror="this.onerror=null; this.src='https://placehold.co/600x400/0F766E/FFFFFF?text=Vertical+Farm';" alt="Small vertical farming setup" class="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500">
-                        </div>
-                        <div class="p-8 flex-grow">
-                            <div class="flex items-center gap-3 text-sm mb-3">
-                                <span class="text-slate-400">Dec 9, 2025</span> 
-                                <span class="w-1 h-1 bg-slate-300 rounded-full"></span>
-                                <span class="inline-flex items-center text-emerald-700 font-medium bg-emerald-50 px-2 py-0.5 rounded-full text-xs">
-                                    Gardening
-                                </span>
-                            </div>
-                            <h3 class="text-xl font-bold text-slate-900 group-hover:text-emerald-600 transition-colors mb-3">Visual Inspiration for 5-Liter Vertical Farming Systems</h3>
-                            <p class="text-slate-500 text-sm leading-relaxed">A collection of visual references for building compact, modular vertical farming setups using 5L containers.</p>
-                        </div>
-                        <div class="px-8 pb-8 pt-0 mt-auto">
-                            <a href="#" class="text-emerald-600 font-semibold text-sm hover:underline">View References</a>
-                        </div>
-                    </article>
-                    
-                    <!-- Original Card 1: Published Paper (Research) -->
-                    <article class="bg-white rounded-2xl shadow-sm hover:shadow-lg overflow-hidden flex flex-col transition-all duration-300 group">
-                        <div class="relative h-56 overflow-hidden">
-                            <img src="https://placehold.co/600x400/06B6D4/FFFFFF?text=Academic+Journal&font=inter" onerror="this.onerror=null; this.src='https://placehold.co/600x400/06B6D4/FFFFFF?text=Academic+Journal';" alt="Academic journal cover" class="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500">
-                        </div>
-                        <div class="p-8 flex-grow">
-                            <div class="flex items-center gap-3 text-sm mb-3">
-                                <span class="text-slate-400">Nov 27, 2025</span> 
-                                <span class="w-1 h-1 bg-slate-300 rounded-full"></span>
-                                <span class="inline-flex items-center text-cyan-700 font-medium bg-cyan-50 px-2 py-0.5 rounded-full text-xs">
-                                    Research
-                                </span>
-                            </div>
-                            <h3 class="text-xl font-bold text-slate-900 group-hover:text-cyan-600 transition-colors mb-3">Unpacking Water Scarcity Adaptation Strategies for Sustainable Food Production Systems in Sub-Saharan Africa</h3>
-                            <p class="text-slate-500 text-sm leading-relaxed">My published review on water management, adaptation, and sustainable food production systems in Sub-Saharan Africa.</p>
-                        </div>
-                        <div class="px-8 pb-8 pt-0 mt-auto">
-                            <a href="https://www.mdpi.com/2071-1050/17/23/10627" target="_blank" rel="noopener noreferrer" class="text-emerald-600 font-semibold text-sm hover:underline">Read Paper (MDPI)</a>
-                        </div>
-                    </article>
-                    
-                    <!-- Original Card 2: Gardening (Emerald) -->
-                    <article class="bg-white rounded-2xl shadow-sm hover:shadow-lg overflow-hidden flex flex-col transition-all duration-300 group">
-                        <div class="relative h-56 overflow-hidden">
-                            <img src="https://placehold.co/600x400/22C55E/FFFFFF?text=Herbs&font=inter" onerror="this.onerror=null; this.src='https://placehold.co/600x400/22C55E/FFFFFF?text=Herbs';" alt="Herb Garden" class="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500">
-                        </div>
-                        <div class="p-8 flex-grow">
-                            <div class="flex items-center gap-3 text-sm mb-3">
-                                <span class="text-slate-400">Oct 28, 2025</span>
-                                <span class="w-1 h-1 bg-slate-300 rounded-full"></span>
-                                <span class="inline-flex items-center text-emerald-700 font-medium bg-emerald-50 px-2 py-0.5 rounded-full text-xs">
-                                    Gardening
-                                </span>
-                            </div>
-                            <h3 class="text-xl font-bold text-slate-900 group-hover:text-emerald-600 transition-colors mb-3">A Beginner's Guide to Container Herb Gardening</h3>
-                            <p class="text-slate-500 text-sm leading-relaxed">Everything you need to know about soil, pots, and sunlight to keep your basil and mint thriving.</p>
-                        </div>
-                        <div class="px-8 pb-8 pt-0 mt-auto">
-                            <a href="#" class="text-emerald-600 font-semibold text-sm hover:underline">Read Post</a>
-                        </div>
-                    </article>
-                    
-                    <!-- Original Card 3: Web Dev (Teal) -->
-                    <article class="bg-white rounded-2xl shadow-sm hover:shadow-lg overflow-hidden flex flex-col transition-all duration-300 group">
-                         <div class="relative h-56 overflow-hidden">
-                            <img src="https://placehold.co/600x400/8B5CF6/FFFFFF?text=Code&font=inter" onerror="this.onerror=null; this.src='https://placehold.co/600x400/8B5CF6/FFFFFF?text=Code';" alt="Code on a screen" class="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500">
-                        </div>
-                        <div class="p-8 flex-grow">
-                            <div class="flex items-center gap-3 text-sm mb-3">
-                                <span class="text-slate-400">Oct 15, 2025</span>
-                                <span class="w-1 h-1 bg-slate-300 rounded-full"></span>
-                                <span class="inline-flex items-center text-teal-700 font-medium bg-teal-50 px-2 py-0.5 rounded-full text-xs">
-                                    Web Dev
-                                </span>
-                            </div>
-                            <h3 class="text-xl font-bold text-slate-900 group-hover:text-teal-600 transition-colors mb-3">5 Useful JavaScript Array Methods</h3>
-                            <p class="text-slate-500 text-sm leading-relaxed">A quick dive into reduce, map, filter, and some newer ES6+ features you might have missed.</p>
-                        </div>
-                        <div class="px-8 pb-8 pt-0 mt-auto">
-                            <a href="#" class="text-emerald-600 font-semibold text-sm hover:underline">Read Post</a>
-                        </div>
-                    </article>
-                </div>
-                
-                <div class="mt-8 text-center md:hidden">
-                     <a href="#" class="inline-flex items-center font-medium text-emerald-600 hover:text-emerald-800">
-                        View all posts <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>
+        <!-- Maps Section -->
+        <section id="maps" class="py-24 bg-gray-800/30">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-12 fade-in-section">
+                    <h2 class="text-3xl md:text-4xl font-bold text-white mb-4">🗺️ Local Guide & Maps</h2>
+                    <a href="http://googleusercontent.com/maps.google.com" target="_blank" class="inline-flex items-center px-6 py-3 rounded-full border border-cyan-500 text-cyan-400 hover:bg-cyan-500/10 transition-colors mt-4">
+                        View My Google Local Guide Profile
                     </a>
+                    
+                    <div class="flex justify-center flex-wrap gap-2 mt-6">
+                        <button class="filter-btn active px-4 py-2 rounded-full border border-gray-600 text-gray-300 text-sm transition-all" onclick="filterData('maps', 'all', this)">All</button>
+                        <button class="filter-btn px-4 py-2 rounded-full border border-gray-600 text-gray-300 text-sm transition-all" onclick="filterData('maps', 'Art', this)">Art & Heritage</button>
+                        <button class="filter-btn px-4 py-2 rounded-full border border-gray-600 text-gray-300 text-sm transition-all" onclick="filterData('maps', 'Nature', this)">Nature & Trails</button>
+                        <button class="filter-btn px-4 py-2 rounded-full border border-gray-600 text-gray-300 text-sm transition-all" onclick="filterData('maps', 'Community', this)">Community</button>
+                    </div>
+                </div>
+
+                <div id="maps-grid" class="grid md:grid-cols-3 gap-8 mb-16 fade-in-section"></div>
+
+                <!-- Itinerary Request -->
+                <div class="grid lg:grid-cols-2 gap-12 fade-in-section">
+                    <div class="bg-gray-900 rounded-2xl border-2 border-dashed border-gray-700 flex items-center justify-center p-8">
+                        <div class="text-center">
+                            <svg class="w-12 h-12 text-gray-600 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+                            <span class="text-gray-500 font-medium block">Virtual Tours Module</span>
+                            <p class="text-gray-600 text-sm mt-2">Embedded Street View / YouTube walkthroughs placeholder.</p>
+                        </div>
+                    </div>
+                    <div class="bg-gray-800 rounded-2xl p-8 border border-gray-700">
+                        <h3 class="text-2xl font-bold text-cyan-400 mb-6">Request Custom Itinerary</h3>
+                        <form onsubmit="handleFormSubmit(event, 'Itinerary Request')" class="space-y-4">
+                            <input type="text" placeholder="Name" required class="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-3 text-white focus:border-cyan-500 outline-none">
+                            <input type="email" placeholder="Email" required class="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-3 text-white focus:border-cyan-500 outline-none">
+                            <textarea rows="3" placeholder="Interests (e.g. Hiking, Street Art)" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-3 text-white focus:border-cyan-500 outline-none"></textarea>
+                            <button type="submit" class="w-full bg-cyan-600 hover:bg-cyan-700 text-white font-bold py-3 rounded-lg transition-all">Submit Request</button>
+                        </form>
+                    </div>
                 </div>
             </div>
         </section>
 
-        <!-- About/Contact Section -->
-        <section id="about" class="bg-white py-24">
-            <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="grid md:grid-cols-2 gap-16 items-center fade-in-section">
-                    <div class="relative">
-                        <div class="absolute -inset-4 bg-emerald-100 rounded-xl transform rotate-3 -z-10"></div>
-                        <div class="absolute -inset-4 bg-teal-50 rounded-xl transform -rotate-3 -z-20"></div>
-                        <img src="https://placehold.co/600x600/334155/FFFFFF?text=Tevin's+Portrait&font=inter" 
-                             onerror="this.onerror=null; this.src='https://placehold.co/600x600/334155/FFFFFF?text=Tevin\'s+Portrait';"
-                             alt="Portrait of Tevin Ian Mokoena" 
-                             class="rounded-lg shadow-2xl w-full object-cover border-4 border-white">
+        <!-- Research Section (The Paper) -->
+        <section id="research" class="py-24">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-12 fade-in-section">
+                    <h2 class="text-3xl md:text-4xl font-bold text-white mb-4">🔬 Academic Research</h2>
+                </div>
+                <div class="bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100 flex flex-col md:flex-row fade-in-section hover:shadow-2xl transition-all">
+                    <div class="md:w-1/3 h-64 md:h-auto bg-gray-200 flex items-center justify-center">
+                        <span class="text-cyan-700 font-bold text-lg">MDPI Sustainability</span>
                     </div>
-                    
-                    <div id="contact">
-                        <span class="text-emerald-600 font-semibold text-sm tracking-wider uppercase mb-2 block">Who Am I?</span>
-                        <h2 class="text-4xl md:text-5xl font-bold text-slate-900 mt-2 mb-6">Hi, I'm Tevin Ian.</h2>
-                        <div class="space-y-4 text-lg text-slate-600 leading-relaxed">
-                            <p>
-                                By day, I'm an academic researcher and web developer. By night (and on weekends), you'll find me in my workshop covered in sawdust, in the garden, or exploring the hidden gems of my city.
-                            </p>
-                            <p>
-                                I believe in the power of <strong class="text-slate-800">"doing"</strong>. This site is my personal documentation of everything I build, grow, and learn. It's not just a portfolio; it's a living archive of my curiosity.
-                            </p>
+                    <div class="p-8 md:w-2/3 flex flex-col justify-center">
+                        <div class="flex items-center gap-3 mb-4">
+                            <span class="px-3 py-1 rounded-full bg-cyan-100 text-cyan-800 text-xs font-bold uppercase">Published Paper</span>
+                            <span class="text-gray-500 text-sm">Nov 27, 2025</span>
                         </div>
-                        
-                        <!-- Contact Block (UPDATED) -->
-                        <div class="mt-10">
-                            <h3 class="text-xl font-bold text-slate-900 mb-4">Connect with me</h3>
-                            <div class="space-y-4">
-                                <!-- Personal Email -->
-                                <a href="mailto:tevin.mokoena@gmail.com" class="flex items-center group gap-3 p-4 bg-white border border-slate-200 rounded-xl shadow-sm hover:shadow-md transition-all duration-300 hover:border-emerald-300">
-                                    <svg class="w-6 h-6 text-emerald-600 group-hover:text-emerald-700 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-label="Personal Email"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
-                                    <span class="font-medium text-slate-700 group-hover:text-slate-900">tevin.mokoena@gmail.com</span>
-                                </a>
-                                <!-- Academic Email -->
-                                <a href="mailto:201941899@ump.com" class="flex items-center group gap-3 p-4 bg-white border border-slate-200 rounded-xl shadow-sm hover:shadow-md transition-all duration-300 hover:border-teal-300">
-                                    <svg class="w-6 h-6 text-teal-600 group-hover:text-teal-700 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-label="Academic Email"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13M12 2a9.99 9.99 0 00-9.87 8.35c.16 3.6 2.05 6.8 5.43 8.78.27.16.55.23.83.25h6.63c.28-.02.56-.09.83-.25 3.38-1.98 5.27-5.18 5.43-8.78A9.99 9.99 0 0012 2zM12 12m-2 0a2 2 0 104 0 2 2 0 10-4 0z"></path></svg>
-                                    <span class="font-medium text-slate-700 group-hover:text-slate-900">201941899@ump.com (Academic)</span>
-                                </a>
-                                <!-- ORCID ID -->
-                                <a href="https://orcid.org/0009-0009-8937-1177" target="_blank" rel="noopener noreferrer" class="flex items-center group gap-3 p-4 bg-white border border-slate-200 rounded-xl shadow-sm hover:shadow-md transition-all duration-300 hover:border-cyan-300">
-                                    <!-- ORCID Icon (A simple globe/ID badge for uniqueness) -->
-                                    <svg class="w-6 h-6 text-cyan-600 group-hover:text-cyan-700 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-label="ORCID ID"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m-4 5h4a2 2 0 002-2V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
-                                    <span class="font-medium text-slate-700 group-hover:text-slate-900">ORCID ID: 0009-0009-8937-1177</span>
-                                </a>
-                            </div>
-                        </div>
-                        
+                        <h3 class="text-2xl font-bold text-gray-900 mb-3">Unpacking Water Scarcity Adaptation Strategies for Sustainable Food Production Systems in Sub-Saharan Africa</h3>
+                        <p class="text-gray-600 mb-6">A comprehensive review published in <em class="text-gray-800">Sustainability (MDPI)</em> examining indigenous knowledge systems and small-scale irrigation.</p>
+                        <a href="https://www.mdpi.com/2071-1050/17/23/10627" target="_blank" class="inline-flex items-center text-cyan-700 font-bold hover:text-cyan-900">
+                            Read Full Paper &rarr;
+                        </a>
                     </div>
                 </div>
             </div>
@@ -556,178 +303,168 @@
 
     </main>
 
-    <footer class="bg-slate-900 text-slate-300 border-t border-slate-800">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
-                <div class="col-span-1 md:col-span-2">
-                    <a href="#" class="flex items-center gap-2 mb-4 group">
-                        <!-- Updated color -->
-                        <div class="w-8 h-8 bg-emerald-600 rounded flex items-center justify-center">
-                            <span class="text-white font-bold text-sm">T</span>
-                        </div>
-                        <span class="text-xl font-bold text-white">Tevin Ian Mokoena</span>
-                    </a>
-                    <p class="text-slate-400 max-w-sm text-sm leading-relaxed">
-                        A personal portfolio of digital tools, physical creations, garden logs, and local guides. Built with passion and coffee.
-                    </p>
-                </div>
-                
-                <div>
-                    <h3 class="text-sm font-bold text-white uppercase tracking-wider mb-4">Navigation</h3>
-                    <ul class="space-y-3 text-sm">
-                        <li><a href="#" class="hover:text-emerald-400 transition-colors">Home</a></li>
-                        <li><a href="#projects" class="hover:text-emerald-400 transition-colors">Projects</a></li>
-                        <li><a href="#guides" class="hover:text-emerald-400 transition-colors">How-To's</a></li>
-                        <li><a href="#about" class="hover:text-emerald-400 transition-colors">About Me</a></li>
-                        <li><a href="#contact" class="hover:text-emerald-400 transition-colors">Contact</a></li>
-                    </ul>
-                </div>
-                
-                <div>
-                    <h3 class="text-sm font-bold text-white uppercase tracking-wider mb-4">Connect</h3>
-                    <div class="flex flex-wrap gap-3 text-sm">
-                        <!-- Personal Email Footer Link -->
-                        <a href="mailto:tevin.mokoena@gmail.com" class="inline-flex items-center text-slate-400 hover:text-emerald-400 transition-colors" aria-label="Personal Email">
-                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
-                            <span>Email (Personal)</span>
-                        </a>
-                        <!-- Academic Email Footer Link -->
-                        <a href="mailto:201941899@ump.com" class="inline-flex items-center text-slate-400 hover:text-teal-400 transition-colors" aria-label="Academic Email">
-                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13M12 2a9.99 9.99 0 00-9.87 8.35c.16 3.6 2.05 6.8 5.43 8.78.27.16.55.23.83.25h6.63c.28-.02.56-.09.83-.25 3.38-1.98 5.27-5.18 5.43-8.78A9.99 9.99 0 0012 2z"></path></svg>
-                            <span>Email (Academic)</span>
-                        </a>
-                        <!-- ORCID ID Footer Link -->
-                         <a href="https://orcid.org/0009-0009-8937-1177" target="_blank" rel="noopener noreferrer" class="inline-flex items-center text-slate-400 hover:text-cyan-400 transition-colors" aria-label="ORCID ID">
-                             <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m-4 5h4a2 2 0 002-2V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
-                            <span>ORCID</span>
-                        </a>
-                        <!-- GitHub link retained -->
-                        <a href="#" class="inline-flex items-center text-slate-400 hover:text-white transition-colors" aria-label="GitHub">
-                            <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.108-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.91 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
-                            <span>GitHub</span>
-                        </a>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="border-t border-slate-800 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
-                <p class="text-xs text-slate-500 text-center md:text-left">&copy; 2025 Tevin Ian Mokoena. All rights reserved.</p>
-                <div class="flex gap-4 text-xs text-slate-500">
-                    <a href="#" class="hover:text-slate-300">Privacy Policy</a>
-                    <a href="#" class="hover:text-slate-300">Terms of Service</a>
-                </div>
-            </div>
-        </div>
+    <footer class="bg-gray-900 border-t border-gray-800 py-12 text-center text-gray-500 text-sm">
+        <p>© 2025 Tevin Ian Mokoena. All rights reserved.</p>
     </footer>
 
+    <!-- Image Modal -->
+    <div id="imageModal" class="modal" onclick="closeModal()">
+        <img id="modalImg" class="modal-content" src="" alt="Full view">
+    </div>
+
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const menuButton = document.getElementById('mobile-menu-button');
-            const mobileMenu = document.getElementById('mobile-menu');
-            const menuLinks = mobileMenu.querySelectorAll('a');
-            const navbar = document.getElementById('navbar');
+        // --- DATA ---
+        const portfolioData = {
+            web: [
+                { title: "E-commerce React App", desc: "Full-stack e-commerce site built with React, Node.js, and Stripe.", img: "https://images.unsplash.com/photo-1557821552-17105176677c?w=800&h=600&fit=crop" },
+                { title: "Task Management", desc: "Interactive Kanban board with React and drag-and-drop.", img: "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=800&h=600&fit=crop" },
+                { title: "Weather Forecast App", desc: "Real-time weather forecasting using OpenWeatherMap API.", img: "https://images.unsplash.com/photo-1592210454359-9043f067919b?w=800&h=600&fit=crop" }
+            ],
+            carpentry: [
+                { title: "Cedar Raised Garden Bed", category: "DIY", desc: "How-to guide for a 4x8 cedar raised garden bed.", img: "https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?w=800&h=600&fit=crop" },
+                { title: "Custom Tool Cabinet", category: "Storage", desc: "Wall-mounted cabinet for garden tools from reclaimed wood.", img: "https://images.unsplash.com/photo-1581783898377-1c85bf937427?w=800&h=600&fit=crop" },
+                { title: "Pallet Compost Bin", category: "DIY", desc: "Three-compartment compost system using free pallets.", img: "https://images.unsplash.com/photo-1591857177580-dc82b9ac4e1e?w=800&h=600&fit=crop" },
+                { title: "Reclaimed Desk", category: "Furniture", desc: "Minimalist office desk built from locally sourced oak.", img: "https://images.unsplash.com/photo-1594056233488-72767078326e?w=800&h=600&fit=crop" }
+            ],
+            gardening: [
+                { title: "Vertical Herb Tower", category: "Edible", desc: "Space-saving vertical garden for culinary herbs.", img: "https://images.unsplash.com/photo-1466692476868-aef1dfb1e735?w=800&h=600&fit=crop" },
+                { title: "DIY Liquid Fertilizer", category: "Composting", desc: "Brewing nutrient-rich compost tea for your garden.", img: "https://images.unsplash.com/photo-1615671524827-c1fe3973b648?w=800&h=600&fit=crop" },
+                { title: "5L Vertical Farming", category: "Hydroponics", desc: "Modular hydroponic setup using recycled containers.", img: "https://images.unsplash.com/photo-1530836369250-ef72a3f5cda8?w=800&h=600&fit=crop" }
+            ],
+            maps: [
+                { title: "Durban Street Art", category: "Art", desc: "Walking tour of 50+ public murals.", img: "https://images.unsplash.com/photo-1499781350541-7783f6c6a0c8?w=800&h=600&fit=crop" },
+                { title: "Hidden Beaches Guide", category: "Nature", desc: "Guide to lesser-known beaches along the KZN coast.", img: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&h=600&fit=crop" },
+                { title: "Community Gardens", category: "Community", desc: "Interactive map of public growing spaces.", img: "https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=800&h=600&fit=crop" }
+            ]
+        };
 
-            // --- Toggle Mobile Menu ---
-            menuButton.addEventListener('click', () => {
-                mobileMenu.classList.toggle('hidden');
+        // --- RENDER LOGIC ---
+        function renderCards(sectionKey, filter = 'all') {
+            const container = document.getElementById(`${sectionKey}-grid`);
+            const data = portfolioData[sectionKey];
+            container.innerHTML = '';
+
+            const filteredData = filter === 'all' ? data : data.filter(item => item.category === filter);
+
+            filteredData.forEach(item => {
+                const card = document.createElement('div');
+                card.className = "bg-gray-800 rounded-xl overflow-hidden border border-gray-700 hover:border-emerald-500 transition-all duration-300 tilt-card";
+                card.innerHTML = `
+                    <div class="h-48 overflow-hidden relative group">
+                        <img src="${item.img}" alt="${item.title}" class="w-full h-full object-cover hover:scale-110 transition duration-700 cursor-pointer" onclick="openModal('${item.img}')">
+                        ${item.category ? `<span class="absolute top-2 right-2 bg-black/70 text-white text-xs px-2 py-1 rounded">${item.category}</span>` : ''}
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-xl font-bold text-white mb-2">${item.title}</h3>
+                        <p class="text-gray-400 text-sm mb-4">${item.desc}</p>
+                        <a href="#" class="text-emerald-400 font-medium text-sm flex items-center hover:underline">
+                            View Details <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+                        </a>
+                    </div>
+                `;
+                container.appendChild(card);
             });
+            applyTilt();
+        }
 
-            menuLinks.forEach(link => {
-                link.addEventListener('click', () => {
-                    mobileMenu.classList.add('hidden');
+        // --- FILTER FUNCTION ---
+        function filterData(section, category, btn) {
+            const buttons = btn.parentElement.querySelectorAll('button');
+            buttons.forEach(b => b.classList.remove('active', 'bg-emerald-700', 'text-white', 'border-transparent'));
+            buttons.forEach(b => b.classList.add('text-gray-300', 'border-gray-600'));
+            
+            btn.classList.add('active', 'bg-emerald-700', 'text-white', 'border-transparent');
+            btn.classList.remove('text-gray-300', 'border-gray-600');
+
+            renderCards(section, category);
+        }
+
+        // --- 3D TILT ---
+        function applyTilt() {
+            document.querySelectorAll('.tilt-card').forEach(card => {
+                card.addEventListener('mousemove', (e) => {
+                    const rect = card.getBoundingClientRect();
+                    const x = e.clientX - rect.left;
+                    const y = e.clientY - rect.top;
+                    const centerX = rect.width / 2;
+                    const centerY = rect.height / 2;
+                    const rotateX = ((y - centerY) / 20) * -1;
+                    const rotateY = (x - centerX) / 20;
+                    card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1.02)`;
+                });
+                card.addEventListener('mouseleave', () => {
+                    card.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) scale(1)';
                 });
             });
+        }
 
-            // --- Navbar Scroll Effect ---
-            window.addEventListener('scroll', () => {
-                if (window.scrollY > 20) {
-                    navbar.classList.add('shadow-md');
-                } else {
-                    navbar.classList.remove('shadow-md');
-                }
-            });
+        // --- SEARCH ---
+        document.getElementById('globalSearch').addEventListener('keyup', function(e) {
+            const term = e.target.value.toLowerCase();
+            const sections = ['web', 'carpentry', 'gardening', 'maps'];
             
-            // --- Reveal on Scroll Animation (Updated class name) ---
-            function reveal() {
-                var reveals = document.querySelectorAll(".fade-in-section");
-                for (var i = 0; i < reveals.length; i++) {
-                    var windowHeight = window.innerHeight;
-                    var elementTop = reveals[i].getBoundingClientRect().top;
-                    var elementVisible = 150;
-                    if (elementTop < windowHeight - elementVisible) {
-                        reveals[i].classList.add("active");
-                    }
-                }
+            if(term.length === 0) {
+                sections.forEach(sec => renderCards(sec));
+                return;
             }
-            window.addEventListener("scroll", reveal);
-            reveal(); // Trigger once on load
-            
-            // --- Project Filtering Logic (with updated colors) ---
-            const filterButtons = document.querySelectorAll('.filter-btn');
-            const projectCards = document.querySelectorAll('.project-card');
 
-            // Filter configuration with colors (Updated to green palette)
-            const filterConfig = {
-                'all': { bg: 'bg-slate-800', text: 'text-white' },
-                'web': { bg: 'bg-teal-600', text: 'text-white', border: 'border-teal-600' },
-                'gardening': { bg: 'bg-emerald-600', text: 'text-white', border: 'border-emerald-600' },
-                'carpentry': { bg: 'bg-amber-600', text: 'text-white', border: 'border-amber-600' },
-                'maps': { bg: 'bg-red-600', text: 'text-white', border: 'border-red-600' },
-                'research': { bg: 'bg-cyan-600', text: 'text-white', border: 'border-cyan-600' }
-            };
+            sections.forEach(section => {
+                const container = document.getElementById(`${section}-grid`);
+                const data = portfolioData[section];
+                container.innerHTML = '';
+                
+                const matches = data.filter(item => 
+                    item.title.toLowerCase().includes(term) || 
+                    item.desc.toLowerCase().includes(term)
+                );
 
-            // Global function to filter (used by interest cards)
-            window.filterProjects = function(filterType) {
-                // Find the button associated with this filter type
-                const targetBtn = document.querySelector(`.filter-btn[data-filter="${filterType}"]`);
-                if(targetBtn) {
-                    targetBtn.click();
-                    // Smooth scroll to projects section
-                    document.getElementById('projects').scrollIntoView({ behavior: 'smooth' });
-                }
-            };
-
-            filterButtons.forEach(button => {
-                button.addEventListener('click', () => {
-                    const filter = button.dataset.filter;
-
-                    // Reset all buttons
-                    filterButtons.forEach(btn => {
-                        // Remove active styles
-                        btn.className = `filter-btn inline-flex items-center gap-2 bg-white text-slate-600 border border-slate-200 font-medium py-2.5 px-6 rounded-full shadow-sm transition-all duration-300 hover:transform hover:-translate-y-1`;
-                        
-                        // Add hover classes based on their data-filter (re-adding original logic with new colors)
-                        const f = btn.dataset.filter;
-                        if(f === 'web') btn.classList.add('hover:text-teal-600', 'hover:bg-teal-50', 'hover:border-teal-300');
-                        else if(f === 'gardening') btn.classList.add('hover:text-emerald-600', 'hover:bg-emerald-50', 'hover:border-emerald-300');
-                        else if(f === 'carpentry') btn.classList.add('hover:text-amber-600', 'hover:bg-amber-50', 'hover:border-amber-300');
-                        else if(f === 'maps') btn.classList.add('hover:text-red-600', 'hover:bg-red-50', 'hover:border-red-300');
-                        else if(f === 'research') btn.classList.add('hover:text-cyan-600', 'hover:bg-cyan-50', 'hover:border-cyan-300');
-                    });
-
-                    // Apply active style to clicked button
-                    const config = filterConfig[filter];
-                    button.classList.remove('bg-white', 'text-slate-600', 'border-slate-200');
-                    button.classList.add(config.bg, config.text, 'shadow-md');
-                    if(config.border) button.classList.add('border', config.border);
-
-                    // Filter cards
-                    projectCards.forEach(card => {
-                        const categories = card.dataset.category.split(' ');
-                        card.classList.remove('item-fade-in'); 
-
-                        if (filter === 'all' || categories.includes(filter)) {
-                            card.style.display = 'block';
-                            void card.offsetWidth; // Trigger reflow
-                            card.classList.add('item-fade-in');
-                        } else {
-                            card.style.display = 'none';
-                        }
-                    });
+                matches.forEach(item => {
+                    const card = document.createElement('div');
+                    card.className = "bg-gray-800 rounded-xl overflow-hidden border border-gray-700 tilt-card";
+                    card.innerHTML = `
+                        <div class="h-48 overflow-hidden relative"><img src="${item.img}" class="w-full h-full object-cover"></div>
+                        <div class="p-6"><h3 class="text-xl font-bold text-white">${item.title}</h3><p class="text-gray-400 text-sm">${item.desc}</p></div>
+                    `;
+                    container.appendChild(card);
                 });
             });
         });
-    </script>
 
+        // --- MODAL ---
+        function openModal(src) {
+            document.getElementById('modalImg').src = src;
+            document.getElementById('imageModal').classList.add('active');
+        }
+        function closeModal() {
+            document.getElementById('imageModal').classList.remove('active');
+        }
+
+        // --- INIT ---
+        document.addEventListener('DOMContentLoaded', () => {
+            renderCards('web');
+            renderCards('carpentry');
+            renderCards('gardening');
+            renderCards('maps');
+
+            gsap.registerPlugin(ScrollTrigger);
+            gsap.utils.toArray('.fade-in-section').forEach(el => {
+                gsap.to(el, {
+                    scrollTrigger: { trigger: el, start: "top 85%", toggleClass: "active", once: true }
+                });
+            });
+        });
+
+        function handleFormSubmit(e, type = "Request") {
+            e.preventDefault();
+            const btn = e.target.querySelector('button');
+            const originalText = btn.innerText;
+            btn.innerText = 'Sending...';
+            setTimeout(() => {
+                alert(`${type} sent successfully! (Demo)`);
+                btn.innerText = originalText;
+                e.target.reset();
+            }, 1500);
+        }
+    </script>
 </body>
 </html>
